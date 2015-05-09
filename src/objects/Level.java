@@ -53,6 +53,7 @@ public class Level {
 	private int mapWidth; // The map array width.
 	private int mapHeight; // The map array height.
 	private int[][] map; // The map array. (height, width)
+	private int[][] original_map;
 	private int tileSize; // The tileSize. Preferably 32.
 	private ArrayList<Rectangle2D.Double> barrierCollisionBoxes; // The
 																	// arraylist
@@ -67,7 +68,7 @@ public class Level {
 																	// boxes.
 	private ArrayList<Gold> goldObjects; // The arraylist of Gold objects.
 	private HashMap<Integer, BufferedImage> images; // Hashmap of tile images.
-
+	
 	/**
 	 * Constructs a Level object with given tileSize that searches for a
 	 * specific fileName
@@ -82,9 +83,8 @@ public class Level {
 		this.barrierCollisionBoxes = new ArrayList<Rectangle2D.Double>();
 		this.regularCollisionBoxes = new ArrayList<Rectangle2D.Double>();
 		this.goldObjects = new ArrayList<Gold>();
-
 		this.images = new HashMap<Integer, BufferedImage>();
-
+		
 		populateImages();
 		populateMap(fileName, tileSize);
 
@@ -212,7 +212,12 @@ public class Level {
 			this.mapHeight = Integer.parseInt(imageReader.readLine());
 
 			this.map = new int[this.mapHeight][this.mapWidth];
-
+			this.original_map = new int[this.mapHeight][this.mapWidth];
+			for (int r = 0; r < this.original_map.length; r++) {
+				for (int c = 0; c < this.original_map[r].length; c++) {
+					this.original_map[r][c] = -1;
+				}
+			}
 			for (int r = 0; r < this.map.length; r++) {
 				// Get line of numbers and spaces.
 				currentLine = imageReader.readLine();
@@ -358,8 +363,13 @@ public class Level {
 	 */
 	public void drawTileImage(int tileValue, int row, int col, Graphics2D g2) {
 		// FIXME: reduce the number of calls to the code below. When does drawImage really need to be called?
-		BufferedImage image = this.images.get(tileValue);
-		g2.drawImage(image, row * this.tileSize, col * this.tileSize, null);
+		if(tileValue != original_map[row][col])
+		{
+			BufferedImage image = this.images.get(tileValue);
+			g2.drawImage(image, row * this.tileSize, col * this.tileSize, null);
+			this.original_map[row][col] = tileValue;
+		}
+		
 	}
 
 	/**
